@@ -1,4 +1,18 @@
-let currentContent = getSiteContent();
+const LANGUAGE_STORAGE_KEY = "automationStudioLanguage";
+
+let currentLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "ar";
+let currentContent = getContentForLanguage(currentLanguage);
+
+function getContentForLanguage(language) {
+  if (language === "en") {
+    return EN_SITE_CONTENT;
+  }
+  return getSiteContent();
+}
+
+function getUiText() {
+  return UI_TEXT[currentLanguage];
+}
 
 function cleanPhone(phone) {
   return String(phone || "").replace(/\D/g, "");
@@ -13,7 +27,7 @@ function displayPhone(phone) {
 }
 
 function buildWhatsAppUrl(message) {
-  const phone = cleanPhone(currentContent.admin.phone);
+  const phone = cleanPhone(getSiteContent().admin.phone);
   const text = encodeURIComponent(message);
   return `https://wa.me/${phone}?text=${text}`;
 }
@@ -31,6 +45,10 @@ function listItems(items) {
   return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
 }
 
+function buyLabel() {
+  return currentLanguage === "ar" ? "اشتري الآن" : "Buy Now";
+}
+
 function renderServices(services) {
   const grid = document.querySelector("#servicesGrid");
   if (!grid) return;
@@ -42,7 +60,7 @@ function renderServices(services) {
         <h3>${escapeHtml(service.title)}</h3>
         <p>${escapeHtml(service.description)}</p>
         <ul>${listItems(service.features)}</ul>
-        <a class="btn ${service.featured ? "btn-primary" : "btn-dark"} w-100 whatsapp-link" href="#" data-message="${escapeHtml(service.message)}">Buy Now</a>
+        <a class="btn ${service.featured ? "btn-primary" : "btn-dark"} w-100 whatsapp-link" href="#" data-message="${escapeHtml(service.message)}">${buyLabel()}</a>
       </article>
     </div>
   `).join("");
@@ -69,46 +87,117 @@ function renderPortfolio(portfolio) {
 function renderPricing(pricing) {
   const grid = document.querySelector("#pricingGrid");
   if (!grid) return;
+  const ui = getUiText();
 
   grid.innerHTML = pricing.map((plan) => `
     <div class="col-lg-4">
       <article class="pricing-card ${plan.popular ? "popular" : ""}">
-        ${plan.popular ? '<div class="popular-badge">الأكثر طلباً</div>' : ""}
+        ${plan.popular ? `<div class="popular-badge">${escapeHtml(ui.popular)}</div>` : ""}
         <h3>${escapeHtml(plan.name)}</h3>
         <p>${escapeHtml(plan.description)}</p>
         <div class="price">${escapeHtml(plan.price)}</div>
         <ul>${listItems(plan.features)}</ul>
-        <a class="btn ${plan.popular ? "btn-primary" : "btn-outline-dark"} w-100 whatsapp-link" href="#" data-message="${escapeHtml(plan.message)}">Buy Now</a>
+        <a class="btn ${plan.popular ? "btn-primary" : "btn-outline-dark"} w-100 whatsapp-link" href="#" data-message="${escapeHtml(plan.message)}">${buyLabel()}</a>
       </article>
     </div>
   `).join("");
 }
 
+function setText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function applyStaticText() {
+  const ui = getUiText();
+  document.documentElement.lang = ui.lang;
+  document.documentElement.dir = ui.direction;
+
+  setText('.nav-link[href="#services"]', ui.navServices);
+  setText('.nav-link[href="#portfolio"]', ui.navPortfolio);
+  setText('.nav-link[href="#pricing"]', ui.navPricing);
+  setText('.nav-link[href="#contact"]', ui.navContact);
+
+  const consultButton = document.querySelector(".btn-nav.whatsapp-link");
+  if (consultButton) {
+    consultButton.textContent = ui.navConsult;
+    consultButton.dataset.message = ui.consultMessage;
+  }
+
+  const languageToggle = document.querySelector("#languageToggle");
+  if (languageToggle) {
+    languageToggle.textContent = ui.languageButton;
+  }
+
+  setText(".hero-actions .btn-outline-light", ui.heroSecondary);
+
+  document.querySelectorAll(".hero-stats div").forEach((item, index) => {
+    const stat = ui.stats[index];
+    if (!stat) return;
+    item.querySelector("strong").textContent = stat[0];
+    item.querySelector("span").textContent = stat[1];
+  });
+
+  setText(".metric-card small", ui.metricsMonth);
+  setText(".metric-card.accent small", ui.metricsLeads);
+  document.querySelectorAll(".flow-step").forEach((item, index) => {
+    if (ui.flow[index]) item.textContent = ui.flow[index];
+  });
+  setText(".message-card p", ui.messagePreview);
+  setText(".message-card button", ui.messageButton);
+
+  setText("#services .section-heading span", ui.servicesEyebrow);
+  setText("#services .section-heading h2", ui.servicesTitle);
+  setText("#services .section-heading p", ui.servicesText);
+  setText("#portfolio .section-heading h2", ui.portfolioTitle);
+  setText("#portfolio .section-heading p", ui.portfolioText);
+  setText("#pricing .section-heading h2", ui.pricingTitle);
+  setText("#pricing .section-heading p", ui.pricingText);
+
+  setText("#contact .cta-panel span", ui.ctaEyebrow);
+  setText("#contact .cta-panel h2", ui.ctaTitle);
+  setText("#contact .cta-panel p", ui.ctaText);
+  const ctaButton = document.querySelector("#contact .whatsapp-link");
+  if (ctaButton) {
+    ctaButton.textContent = ui.ctaButton;
+    ctaButton.dataset.message = ui.ctaMessage;
+  }
+
+  setText(".site-footer p", ui.footer);
+}
+
 function bindWhatsAppButtons() {
   document.querySelectorAll(".whatsapp-link").forEach((link) => {
-    link.addEventListener("click", (event) => {
+    link.onclick = (event) => {
       event.preventDefault();
-      const message = link.dataset.message || "مرحباً، أريد معرفة تفاصيل خدماتك.";
+      const message = link.dataset.message || getUiText().defaultMessage;
       window.open(buildWhatsAppUrl(message), "_blank", "noopener,noreferrer");
-    });
+    };
   });
 }
 
 function renderSite() {
-  currentContent = getSiteContent();
+  currentContent = getContentForLanguage(currentLanguage);
+
+  applyStaticText();
 
   document.querySelector("#heroKicker").textContent = currentContent.hero.kicker;
   document.querySelector("#heroTitle").textContent = currentContent.hero.title;
   document.querySelector("#heroDescription").textContent = currentContent.hero.description;
-  document.querySelector("#heroBuyButton").dataset.message = currentContent.hero.ctaMessage;
+  const heroBuyButton = document.querySelector("#heroBuyButton");
+  heroBuyButton.dataset.message = currentContent.hero.ctaMessage;
+  heroBuyButton.textContent = buyLabel();
 
   renderServices(currentContent.services);
   renderPortfolio(currentContent.portfolio);
   renderPricing(currentContent.pricing);
 
   const footerPhone = document.querySelector("#footerPhone");
-  footerPhone.href = `tel:+${cleanPhone(currentContent.admin.phone)}`;
-  footerPhone.textContent = displayPhone(currentContent.admin.phone);
+  const phone = getSiteContent().admin.phone;
+  footerPhone.href = `tel:+${cleanPhone(phone)}`;
+  footerPhone.textContent = displayPhone(phone);
 
   bindWhatsAppButtons();
 }
@@ -120,6 +209,12 @@ document.querySelectorAll(".nav-link").forEach((link) => {
       bootstrap.Collapse.getOrCreateInstance(nav).hide();
     }
   });
+});
+
+document.querySelector("#languageToggle").addEventListener("click", () => {
+  currentLanguage = currentLanguage === "ar" ? "en" : "ar";
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+  renderSite();
 });
 
 renderSite();

@@ -105,6 +105,18 @@ a {
   color: #fff;
 }
 
+.btn-lang {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  min-width: 104px;
+}
+
+.btn-lang:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
 .hero-section {
   min-height: 92vh;
   display: flex;
