@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | Automation Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="dashboard-body">
+    <main class="dashboard-shell">
+      <section class="login-panel" id="loginPanel">
+        <div class="login-card">
+          <a class="back-link" href="index.html">رجوع للموقع</a>
+          <h1>تسجيل دخول Dashboard</h1>
+          <p>ادخل رقم التليفون وكلمة السر للتحكم في محتوى الموقع.</p>
+          <form id="loginForm">
+            <label for="loginPhone">رقم التليفون</label>
+            <input id="loginPhone" type="tel" value="+201142437585" autocomplete="tel">
+            <label for="loginPassword">كلمة السر</label>
+            <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+            <button class="btn btn-primary w-100" type="submit">دخول</button>
+            <div class="login-error" id="loginError" role="alert"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="admin-panel d-none" id="adminPanel">
+        <aside class="dashboard-sidebar">
+          <div class="sidebar-brand">
+            <img class="brand-logo sidebar-logo" src="assets/automation-studio-logo.png" alt="Automation Studio logo">
+            <div>
+              <strong>Automation Studio</strong>
+              <small>لوحة التحكم</small>
+            </div>
+          </div>
+          <nav class="dashboard-tabs" aria-label="Dashboard tabs">
+            <button class="tab-button active" type="button" data-tab="heroTab">الرئيسية</button>
+            <button class="tab-button" type="button" data-tab="servicesTab">الخدمات</button>
+            <button class="tab-button" type="button" data-tab="portfolioTab">Portfolio</button>
+            <button class="tab-button" type="button" data-tab="pricingTab">Pricing</button>
+          </nav>
+          <a class="btn btn-light w-100" href="index.html">عرض الموقع</a>
+          <button class="btn btn-outline-light w-100" id="logoutButton" type="button">تسجيل خروج</button>
+        </aside>
+
+        <div class="dashboard-main">
+          <header class="dashboard-header">
+            <div>
+              <span>Control Center</span>
+              <h2>تحكم في الموقع بسهولة</h2>
+            </div>
+            <div class="dashboard-actions">
+              <button class="btn btn-outline-dark" id="resetButton" type="button">رجوع للأصل</button>
+              <button class="btn btn-primary" id="saveButton" type="button">حفظ التغييرات</button>
+            </div>
+          </header>
+
+          <div class="save-alert" id="saveAlert">تم حفظ التغييرات. افتح الموقع وشوف التحديث فوراً.</div>
+
+          <form id="contentForm">
+            <section class="dashboard-tab active" id="heroTab">
+              <div class="editor-card">
+                <div class="editor-heading">
+                  <h3>بيانات التواصل والهيرو</h3>
+                  <p>البيانات الأساسية اللي تظهر في أول صفحة وأزرار الواتساب.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="adminPhone">رقم واتساب</label>
+                    <input id="adminPhone" type="tel">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="adminPassword">كلمة سر الداشبورد</label>
+                    <input id="adminPassword" type="text">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="heroKickerInput">الجملة الصغيرة</label>
+                    <input id="heroKickerInput" type="text">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="heroTitleInput">عنوان الهيرو</label>
+                    <input id="heroTitleInput" type="text">
+                  </div>
+                  <div class="col-12">
+                    <label for="heroDescriptionInput">وصف الهيرو</label>
+                    <textarea id="heroDescriptionInput" rows="3"></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label for="heroMessageInput">رسالة زر Buy Now الرئيسي</label>
+                    <textarea id="heroMessageInput" rows="2"></textarea>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="dashboard-tab" id="servicesTab">
+              <div class="editor-card">
+                <div class="editor-heading with-action">
+                  <div>
+                    <h3>الخدمات</h3>
+                    <p>كل خدمة تظهر بكارت منفصل وزر شراء خاص بها.</p>
+                  </div>
+                  <button class="btn btn-dark" id="addServiceButton" type="button">إضافة خدمة</button>
+                </div>
+                <div class="repeater" id="servicesEditor"></div>
+              </div>
+            </section>
+
+            <section class="dashboard-tab" id="portfolioTab">
+              <div class="editor-card">
+                <div class="editor-heading with-action">
+                  <div>
+                    <h3>Portfolio</h3>
+                    <p>أضف أعمالك الحقيقية ونتائجها عشان تزود ثقة العملاء.</p>
+                  </div>
+                  <button class="btn btn-dark" id="addPortfolioButton" type="button">إضافة عمل</button>
+                </div>
+                <div class="repeater" id="portfolioEditor"></div>
+              </div>
+            </section>
+
+            <section class="dashboard-tab" id="pricingTab">
+              <div class="editor-card">
+                <div class="editor-heading with-action">
+                  <div>
+                    <h3>Pricing</h3>
+                    <p>عدّل أسماء الباقات والأسعار والمميزات ورسائل واتساب.</p>
+                  </div>
+                  <button class="btn btn-dark" id="addPricingButton" type="button">إضافة باقة</button>
+                </div>
+                <div class="repeater" id="pricingEditor"></div>
+              </div>
+            </section>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="site-data.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
